@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1D3A6E">
+<!-- Security: allows fetch requests to Google Apps Script endpoints -->
+<meta http-equiv="Content-Security-Policy" content="object-src 'none'; base-uri 'self'; form-action 'none'; connect-src 'self' https://script.google.com https://script.googleusercontent.com; upgrade-insecure-requests">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex, nofollow">
+<meta name="format-detection" content="telephone=no">
+<title>GWP Catechists &amp; Caretakers' Registration</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:wght@500;700&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --blue:#1D3A6E; --blue-deep:#12264A; --ink:#18202E; --muted:#5B6578;
+    --paper:#F4F6FA; --card:#FFFFFF; --line:#D6DCE7; --gold:#C99A2E; --gold-soft:#F6EBD0;
+    --error:#B3261E; --ok:#1E6B45;
+    --radius:14px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.45 Figtree,system-ui,sans-serif;-webkit-text-size-adjust:100%}
+  .wrap{max-width:560px;margin:0 auto;padding:0 16px 40px}
+
+  /* Header */
+  header{background:var(--blue);color:#fff;padding:22px 20px 70px;position:relative;overflow:hidden}
+  header::after{content:"";position:absolute;inset:auto -40px -60px auto;width:220px;height:220px;border-radius:50%;border:28px solid rgba(201,154,46,.18)}
+  .eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);font-weight:700;margin:0 0 6px}
+  h1{font-family:Spectral,Georgia,serif;font-weight:700;font-size:26px;line-height:1.15;margin:0;max-width:22ch}
+  header p{margin:10px auto 0;color:#C9D3E6;font-size:14px;max-width:40ch}
+  .head-in{max-width:560px;margin:0 auto;text-align:center;position:relative;z-index:1}
+  .head-in h1{margin-left:auto;margin-right:auto}
+  .head-in .eyebrow{display:block;width:100%;max-width:none;margin:0 auto 6px;text-align:center;padding-left:.14em;box-sizing:border-box}
+
+  /* Live member card */
+  .idcard{margin:-52px 0 18px;background:linear-gradient(135deg,var(--blue-deep),var(--blue));color:#fff;border-radius:16px;padding:16px 18px;box-shadow:0 10px 28px rgba(18,38,74,.28);position:relative;z-index:1;border-top:4px solid var(--gold)}
+  .idcard .row{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+  .idcard small{display:block;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#AFC0DD}
+  .idcard .name{font-family:Spectral,Georgia,serif;font-size:21px;font-weight:700;margin:2px 0 10px;min-height:28px;word-break:break-word}
+  .idcard .role{background:var(--gold);color:var(--blue-deep);font-weight:700;font-size:12px;padding:4px 10px;border-radius:99px;white-space:nowrap}
+  .idcard .meta{display:grid;grid-template-columns:1fr 1fr;gap:8px 14px;font-size:14px}
+  .idcard .meta span{display:block;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+  /* Form */
+  fieldset{border:0;margin:0 0 14px;padding:18px 16px 6px;background:var(--card);border-radius:var(--radius);border:1px solid var(--line)}
+  legend{float:left;width:100%;font-family:Spectral,Georgia,serif;font-size:19px;font-weight:700;color:var(--blue);margin:0 0 12px;padding:0}
+  legend + *{clear:both}
+  .field{margin:0 0 14px}
+  label,.label{display:block;font-weight:600;font-size:14px;margin:0 0 6px}
+  .req{color:var(--error)}
+  .hint{font-size:12.5px;color:var(--muted);margin-top:4px}
+  input,select{width:100%;font:inherit;font-size:16px;color:var(--ink);background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:12px;min-height:48px;appearance:none;-webkit-appearance:none}
+  select{background-image:linear-gradient(45deg,transparent 50%,var(--blue) 50%),linear-gradient(135deg,var(--blue) 50%,transparent 50%);background-position:calc(100% - 20px) 21px,calc(100% - 14px) 21px;background-size:6px 6px;background-repeat:no-repeat;padding-right:36px}
+  select:disabled{background-color:#EEF1F6;color:var(--muted)}
+  input:focus,select:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(29,58,110,.18)}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .seg{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .seg.four{grid-template-columns:1fr 1fr}
+  .seg input{position:absolute;opacity:0;pointer-events:none}
+  .seg label{margin:0;border:1.5px solid var(--line);border-radius:10px;min-height:48px;display:flex;align-items:center;justify-content:center;font-weight:600;cursor:pointer;background:#fff;text-align:center;padding:6px}
+  .seg input:checked + label{background:var(--blue);border-color:var(--blue);color:#fff}
+  .seg input:focus-visible + label{box-shadow:0 0 0 3px rgba(29,58,110,.3)}
+  .invalid input,.invalid select,.invalid .seg label{border-color:var(--error)}
+  .err{display:none;color:var(--error);font-size:13px;margin-top:5px}
+  .invalid .err{display:block}
+
+  /* Submit bar */
+  .bar{position:fixed;left:0;right:0;bottom:0;background:rgba(244,246,250,.96);backdrop-filter:blur(6px);border-top:1px solid var(--line);padding:12px 16px calc(12px + env(safe-area-inset-bottom))}
+  .bar .in{max-width:560px;margin:0 auto}
+  button{width:100%;font:inherit;font-weight:700;font-size:17px;border:0;border-radius:12px;min-height:54px;background:var(--blue);color:#fff;cursor:pointer}
+  button:disabled{opacity:.6}
+  button:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+  .msg{display:none;margin:0 0 14px;padding:12px 14px;border-radius:10px;font-size:14.5px}
+  .msg.show{display:block}
+  .msg.bad{background:#FBE9E7;color:var(--error)}
+
+  /* Success */
+  .done{display:none;text-align:center;padding:10px 4px 30px}
+  .done.show{display:block}
+  .done h2{font-family:Spectral,Georgia,serif;color:var(--blue);font-size:26px;margin:6px 0}
+  .done .regid{display:inline-block;background:var(--gold-soft);color:var(--blue-deep);font-weight:700;font-size:22px;letter-spacing:.06em;padding:10px 18px;border-radius:10px;margin:10px 0 18px;border:1px dashed var(--gold)}
+  .done p{color:var(--muted);margin:0 0 20px}
+  .ghost{background:#fff;color:var(--blue);border:1.5px solid var(--blue)}
+  
+  /* Mode tabs + find panel */
+  .tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:#E3E8F1;padding:5px;border-radius:12px;margin:0 0 14px}
+  .tabs button{min-height:44px;font-size:15px;border-radius:9px;background:transparent;color:var(--blue);font-weight:700}
+  .tabs button[aria-selected=true]{background:#fff;box-shadow:0 1px 4px rgba(18,38,74,.15)}
+  .panel-note{font-size:14px;color:var(--muted);margin:-4px 0 14px}
+  .editbar{display:none;align-items:center;justify-content:space-between;gap:10px;background:var(--gold-soft);border:1px solid var(--gold);color:var(--blue-deep);border-radius:12px;padding:10px 14px;margin:0 0 14px;font-size:14.5px}
+  .editbar.show{display:flex}
+  .editbar b{font-size:15px}
+  .linkbtn{width:auto;min-height:0;background:none;border:0;padding:0;color:var(--blue);font-weight:700;font-size:14.5px;text-decoration:underline}
+  .msg.info{background:#E8EEF8;color:var(--blue-deep)}
+  .opt{font-weight:400;color:var(--muted);font-size:13px}
+  .suggest{font-size:13.5px;color:var(--ink);margin-top:6px}
+  .suggest button{width:auto;min-height:0;display:inline;background:none;border:0;padding:0;color:var(--blue);font-weight:700;font-size:13.5px;text-decoration:underline}
+  
+  /* Photo */
+  .photo{display:flex;gap:14px;align-items:center}
+  .ph-prev{flex:0 0 96px;height:120px;border-radius:12px;border:1.5px dashed var(--line);background:#EEF1F6 center/cover no-repeat;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:12px;text-align:center;padding:6px}
+  .ph-prev.has{border-style:solid;border-color:var(--blue);color:transparent}
+  .ph-btns{flex:1;display:grid;gap:8px}
+  .ph-btn{display:flex;align-items:center;justify-content:center;gap:8px;min-height:46px;border-radius:10px;border:1.5px solid var(--blue);color:var(--blue);background:#fff;font-weight:600;cursor:pointer;margin:0;font-size:15px}
+  .ph-btn svg{flex:0 0 auto}
+  .ph-btn.primary{background:var(--blue);color:#fff}
+  .ph-btn:focus-within{box-shadow:0 0 0 3px rgba(29,58,110,.3)}
+  .ph-btn input{position:absolute;width:1px;height:1px;opacity:0}
+  .ph-remove{background:none;border:0;color:var(--error);font-weight:600;font-size:14px;min-height:32px;width:auto;padding:0;text-align:left}
+  .avatar{width:54px;height:66px;border-radius:8px;background:rgba(255,255,255,.12) center/cover no-repeat;border:2px solid rgba(201,154,46,.7);flex:0 0 auto;margin-right:12px;display:none}
+  .avatar.has{display:block}
+  .idcard .who{display:flex;align-items:flex-start}
+  @media (prefers-reduced-motion:no-preference){ .idcard{transition:transform .2s} }
+  @media (max-width:360px){ .two{grid-template-columns:1fr} h1{font-size:23px} }
+</style>
+</head>
+<body>
+<header>
+  <div class="head-in">
+    <p class="eyebrow">Presbyterian Church of Ghana</p>
+    <h1>Ga West Presbytery Catechists and Caretakers' Conference</h1>
+    <p>Member registration. Fields marked <span style="color:var(--gold)">*</span> are required.</p>
+  </div>
+</header>
+
+<div class="wrap">
+  <!-- Live preview card -->
+  <div class="idcard" aria-hidden="true">
+    <div class="row">
+      <div class="who"><div class="avatar" id="cAvatar"></div><div><small>Member</small><div class="name" id="cName">Your name</div></div></div>
+      <span class="role" id="cRole">Role</span>
+    </div>
+    <div class="meta">
+      <div><small>District</small><span id="cDistrict">—</span></div>
+      <div><small>Congregation</small><span id="cCong">—</span></div>
+    </div>
+  </div>
+
+  <div class="tabs" role="tablist" aria-label="What do you want to do?">
+    <button type="button" role="tab" id="tabNew" aria-selected="true">New registration</button>
+    <button type="button" role="tab" id="tabFind" aria-selected="false">Update my details</button>
+  </div>
+
+  <form id="findForm" novalidate hidden>
+    <fieldset>
+      <legend>Find my registration</legend>
+      <p class="panel-note">Enter the contact number and date of birth you registered with. Both must match.</p>
+      <div class="msg bad" id="findMsg" role="alert"></div>
+      <div class="field"><label for="findPhone">Contact number</label>
+        <input type="text" class="phone" id="findPhone" inputmode="numeric" pattern="0[0-9]{9}" maxlength="10" autocomplete="off" placeholder="e.g. 0241234567">
+        <div class="err">Enter 10 digits starting with 0.</div></div>
+      <div class="field"><label for="findDob">Date of birth</label>
+        <input type="date" id="findDob" autocomplete="off"><div class="err">Enter your date of birth.</div></div>
+      <button type="submit" id="findBtn">Find my registration</button>
+    </fieldset>
+  </form>
+
+  <div class="editbar" id="editBar" role="status">
+    <span>Editing <b id="editId">GWP-CCC-0000</b></span>
+    <button type="button" class="linkbtn" id="cancelEdit">Cancel</button>
+  </div>
+
+  <form id="form" novalidate>
+    <div class="msg bad" id="formMsg" role="alert"></div>
+
+    <fieldset>
+      <legend>Personal details</legend>
+      <div class="field"><label for="firstName">First name <span class="req">*</span></label>
+        <input id="firstName" name="firstName" autocomplete="given-name" required><div class="err">Enter your first name.</div></div>
+      <div class="field"><label for="surname">Surname <span class="req">*</span></label>
+        <input id="surname" name="surname" autocomplete="family-name" required><div class="err">Enter your surname.</div></div>
+      <div class="field"><label for="otherNames">Other names</label>
+        <input id="otherNames" name="otherNames" autocomplete="additional-name"></div>
+
+      <div class="field" data-group="gender"><span class="label">Gender <span class="req">*</span></span>
+        <div class="seg" role="radiogroup" aria-label="Gender">
+          <input type="radio" id="gM" name="gender" value="Male"><label for="gM">Male</label>
+          <input type="radio" id="gF" name="gender" value="Female"><label for="gF">Female</label>
+        </div><div class="err">Choose male or female.</div></div>
+
+      <div class="field"><label for="dob">Date of birth <span class="req">*</span></label>
+        <input type="date" id="dob" name="dob" required><div class="err">Enter a valid date of birth.</div></div>
+
+      <div class="field"><label for="maritalStatus">Marital status <span class="req">*</span></label>
+        <select id="maritalStatus" name="maritalStatus" required>
+          <option value="">Select…</option><option>Single</option><option>Married</option><option>Widowed</option><option>Divorced</option><option>Separated</option>
+        </select><div class="err">Choose your marital status.</div></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Passport photo</legend>
+      <div class="field" id="photoField">
+        <div class="photo">
+          <div class="ph-prev" id="phPrev">No photo yet</div>
+          <div class="ph-btns">
+            <label class="ph-btn primary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>Take photo
+              <input type="file" id="phCamera" accept="image/*" capture="user"></label>
+            <label class="ph-btn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 17l-5-5-9 8"/></svg>Choose from gallery
+              <input type="file" id="phGallery" accept="image/*"></label>
+            <button type="button" class="ph-remove" id="phRemove" hidden>Remove photo</button>
+          </div>
+        </div>
+        <div class="hint">Optional. A clear, front-facing photo of your face. It is cropped to passport shape and compressed before upload.</div>
+        <div class="hint" id="phInfo" style="color:var(--ok);font-weight:600"></div>
+        <div class="err" id="phErr">This photo could not be used. Choose a JPG or PNG photo, or take a new one.</div>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Ministry</legend>
+      <div class="field" data-group="role"><span class="label">I am a <span class="req">*</span></span>
+        <div class="seg" role="radiogroup" aria-label="Role">
+          <input type="radio" id="rC" name="role" value="Catechist"><label for="rC">Catechist</label>
+          <input type="radio" id="rT" name="role" value="Caretaker"><label for="rT">Caretaker</label>
+        </div><div class="err">Choose catechist or caretaker.</div></div>
+
+      <div class="field"><label for="district">District <span class="req">*</span></label>
+        <select id="district" name="district" required><option value="">Loading districts…</option></select>
+        <div class="err">Choose your district.</div></div>
+
+      <div class="field"><label for="congregation">Current congregation <span class="req">*</span></label>
+        <select id="congregation" name="congregation" required disabled><option value="">Choose a district first</option></select>
+        <div class="hint" id="congHint">Only congregations in the selected district are listed.</div>
+        <div class="err">Choose your congregation.</div></div>
+
+      <div class="field"><label for="consecrationDate">Date of consecration</label>
+        <input type="date" id="consecrationDate" name="consecrationDate"><div class="err">The date can't be in the future.</div></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Contact</legend>
+      <div class="field"><label for="phone">Contact number <span class="req">*</span></label>
+        <input type="text" class="phone" id="phone" name="phone" inputmode="numeric" pattern="0[0-9]{9}" maxlength="10" autocomplete="tel-national" placeholder="e.g. 0241234567" required>
+        <div class="hint">10 digits, starting with 0.</div>
+        <div class="err">Enter 10 digits starting with 0, e.g. 0241234567.</div></div>
+      <div class="field"><label for="phone2">Other number <span class="opt">(optional)</span></label>
+        <input type="text" class="phone" id="phone2" name="phone2" inputmode="numeric" pattern="0[0-9]{9}" maxlength="10" placeholder="e.g. 0201234567">
+        <div class="err" id="phone2Err">Enter 10 digits starting with 0, or leave it blank.</div></div>
+      <div class="field"><label for="email">Email <span class="opt">(optional)</span></label>
+        <input type="email" id="email" name="email" inputmode="email" autocomplete="email" autocapitalize="off" spellcheck="false" maxlength="100" placeholder="name@example.com">
+        <div class="suggest" id="emailSuggest" hidden>Did you mean <button type="button" id="emailFix"></button>?</div>
+        <div class="err" id="emailErr">Enter a valid email address, e.g. name@gmail.com, or leave it blank.</div></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>In case of emergency</legend>
+      <div class="field"><label for="emergencyName">Who should we call? <span class="req">*</span></label>
+        <input id="emergencyName" name="emergencyName" placeholder="Full name" required><div class="err">Enter the person's name.</div></div>
+      <div class="two">
+        <div class="field"><label for="emergencyRelationship">Relationship</label>
+          <input id="emergencyRelationship" name="emergencyRelationship" placeholder="e.g. Spouse"></div>
+        <div class="field"><label for="emergencyPhone">Their number <span class="req">*</span></label>
+          <input type="text" class="phone" id="emergencyPhone" name="emergencyPhone" inputmode="numeric" pattern="0[0-9]{9}" maxlength="10" placeholder="0241234567" required><div class="err">Enter 10 digits starting with 0.</div></div>
+      </div>
+    </fieldset>
+    <fieldset id="consentBox">
+      <legend>Your data</legend>
+      <p class="panel-note" style="margin:0 0 12px">Your personal details and photograph will be collected and securely kept by the Ga West Presbytery Catechists and Caretakers' Conference for membership records and communication, including emergencies. Access will be restricted to authorised Conference administrators and your information will not be shared with third parties without your consent, except where required by law. By submitting your details, you consent to their collection and use for these purposes.</p>
+      <div class="field" id="consentField">
+        <label style="display:flex;gap:10px;align-items:flex-start;font-weight:500">
+          <input type="checkbox" id="consent" style="width:22px;height:22px;min-height:0;flex:0 0 auto;margin-top:1px;appearance:auto;-webkit-appearance:checkbox">
+          <span>I agree that my details can be stored and used for this purpose. <span class="req">*</span></span>
+        </label>
+        <div class="err">Tick this box to register.</div>
+      </div>
+    </fieldset>
+    <div id="bar"><button type="submit" id="submitBtn">Submit registration</button></div>
+  </form>
+
+  <div class="done" id="done" role="status">
+    <svg width="64" height="64" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="30" fill="#1D3A6E"/><path d="M19 33l9 9 17-19" stroke="#C99A2E" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <h2 id="doneTitle">Registration saved</h2>
+    <div class="regid" id="regId">GWP-CCC-0000</div>
+    <p id="doneText">Keep this registration number for your records. To view or change your details later, tap "Update my details" and enter your contact number and date of birth.</p>
+    <p id="photoNote" style="display:none;background:#FFF4E5;color:#7A4B00;padding:10px 12px;border-radius:10px;font-size:14px;text-align:left"></p>
+    <button type="button" class="ghost" id="again">Register another member</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  // =========================================================================
+  // CONFIGURATION: Replace with your Google Apps Script Web App URL (/exec)
+  // =========================================================================
+  var API_URL = 'PASTE_YOUR_WEB_APP_URL_HERE';
+
+  var LOOKUPS = {};
+  var hasGAS = typeof google !== 'undefined' && google.script && google.script.run;
+  var hasAPI = API_URL && /^https:\/\/script\.google\.com\/macros\/s\/.+\/exec$/.test(API_URL);
+  var $ = function(id){ return document.getElementById(id); };
+  var form = $('form'), district = $('district'), cong = $('congregation');
+
+  // Demo data fallback if neither GAS nor a valid API_URL is configured
+  var DEMO = { 'Abeka':['Abeka Congregation','Grace Congregation'], 'Amasaman':['Amasaman Congregation','Pokuase Congregation'], 'Dansoman':['Dansoman Congregation','Mount Olivet Congregation'] };
+
+  /**
+   * Unified backend bridge:
+   * - Uses google.script.run if hosted inside Google Apps Script
+   * - Uses fetch() POST to API_URL if hosted on GitHub Pages
+   */
+  function callBackend(action, args, onSuccess, onFailure) {
+    if (hasGAS) {
+      var runner = google.script.run.withSuccessHandler(onSuccess).withFailureHandler(onFailure);
+      runner[action].apply(runner, args);
+      return;
+    }
+    if (!hasAPI) {
+      onFailure(new Error('USER: Backend API URL is not configured yet.'));
+      return;
+    }
+    // Use text/plain to avoid CORS preflight OPTIONS requests, which Apps Script does not handle
+    fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action: action, args: args || [] }),
+      redirect: 'follow'
+    })
+    .then(function(res) {
+      if (!res.ok) throw new Error('Network error (' + res.status + ')');
+      return res.json();
+    })
+    .then(function(json) {
+      if (json && json.ok) {
+        onSuccess(json.data);
+      } else {
+        onFailure(new Error((json && json.error) || 'USER: Something went wrong.'));
+      }
+    })
+    .catch(function(err) {
+      onFailure(err);
+    });
+  }
+
+  function fillDistricts(map){
+    LOOKUPS = map || {};
+    var names = Object.keys(LOOKUPS).sort();
+    district.innerHTML = '<option value="">Select district…</option>' +
+      names.map(function(d){ return '<option>' + esc(d) + '</option>'; }).join('');
+  }
+  function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+
+  district.addEventListener('change', function(){
+    var list = LOOKUPS[district.value] || [];
+    cong.innerHTML = district.value
+      ? '<option value="">Select congregation…</option>' + list.map(function(c){ return '<option>' + esc(c) + '</option>'; }).join('')
+      : '<option value="">Choose a district first</option>';
+    cong.disabled = !district.value;
+    $('congHint').textContent = district.value ? list.length + ' congregation' + (list.length === 1 ? '' : 's') + ' in ' + district.value + '.' : 'Only congregations in the selected district are listed.';
+    preview();
+  });
+
+  // ---------- Modes: new registration / find / edit ----------
+  var MODE = 'new', EDIT_TOKEN = '', KEEP_PHOTO = false;
+  var findForm = $('findForm');
+  function showMsg(id, text, kind){ var m = $(id); m.textContent = text; m.className = 'msg ' + (kind || 'bad') + (text ? ' show' : ''); }
+  function cleanErr(err){
+    var raw = err && err.message ? err.message : String(err || '');
+    if (/^(Exception:\s*)?USER:\s*/.test(raw)) return raw.replace(/^(Exception:\s*)?USER:\s*/, '');
+    if (/permission|authoriz|scope/i.test(raw)) return 'The app is temporarily unavailable while it is being set up. Please try again later.';
+    return 'Something went wrong. Check your internet connection and try again.';
+  }
+  function setTab(which){
+    $('tabNew').setAttribute('aria-selected', which === 'new');
+    $('tabFind').setAttribute('aria-selected', which !== 'new');
+  }
+  function resetForm(){
+    form.reset(); form.querySelectorAll('.invalid').forEach(function(x){ x.classList.remove('invalid'); });
+    district.dispatchEvent(new Event('change')); setPhoto('', ''); $('emailSuggest').hidden = true;
+    showMsg('formMsg', ''); preview();
+  }
+  function goNew(){
+    MODE = 'new'; EDIT_TOKEN = ''; KEEP_PHOTO = false; setTab('new');
+    findForm.hidden = true; $('editBar').classList.remove('show'); $('done').classList.remove('show');
+    resetForm(); form.style.display = ''; $('bar').style.display = '';
+    $('submitBtn').textContent = 'Submit registration'; $('consentBox').hidden = false; window.scrollTo(0, 0);
+  }
+  function goFind(){
+    MODE = 'find'; EDIT_TOKEN = ''; setTab('find');
+    form.style.display = 'none'; $('bar').style.display = 'none'; $('done').classList.remove('show');
+    $('editBar').classList.remove('show'); findForm.hidden = false; showMsg('findMsg', '');
+    window.scrollTo(0, 0); setTimeout(function(){ $('findPhone').focus(); }, 50);
+  }
+  $('tabNew').addEventListener('click', goNew);
+  $('tabFind').addEventListener('click', goFind);
+  $('cancelEdit').addEventListener('click', goNew);
+
+  function loadRecord(res){
+    var r = res.record;
+    MODE = 'edit'; EDIT_TOKEN = res.token; setTab('find');
+    resetForm();
+    ['firstName','surname','otherNames','dob','maritalStatus','email','phone','phone2','consecrationDate','emergencyName','emergencyRelationship','emergencyPhone']
+      .forEach(function(k){ if ($(k)) $(k).value = r[k] || ''; });
+    ['gender','role'].forEach(function(g){
+      var el = form.querySelector('input[name=' + g + '][value="' + (r[g] || '').replace(/"/g, '') + '"]'); if (el) el.checked = true;
+    });
+    if (r.district && !LOOKUPS[r.district]) LOOKUPS[r.district] = [];
+    if (r.district && r.congregation && LOOKUPS[r.district].indexOf(r.congregation) === -1) LOOKUPS[r.district].push(r.congregation);
+    fillDistricts(LOOKUPS); district.value = r.district || ''; district.dispatchEvent(new Event('change'));
+    cong.value = r.congregation || '';
+    if (res.photoData) { setPhoto(res.photoData, 'Your saved photo. Take or choose a new one to replace it.'); KEEP_PHOTO = true; }
+    findForm.hidden = true; form.style.display = ''; $('bar').style.display = '';
+    $('editId').textContent = r.id; $('editBar').classList.add('show');
+    $('submitBtn').textContent = 'Save changes'; $('consentBox').hidden = true;
+    showMsg('formMsg', 'Check your details, make any changes, then tap Save changes. You have ' + res.minutes + ' minutes.', 'info');
+    $('findPhone').value = ''; $('findDob').value = '';
+    clearTimeout(window.__editTimer);
+    window.__editTimer = setTimeout(function(){ if (MODE === 'edit') { goFind(); resetForm(); showMsg('findMsg', 'Your editing time ran out, so your details were cleared from this screen. Find your registration again to continue.'); } }, res.minutes * 60000);
+    preview(); window.scrollTo(0, 0);
+  }
+
+  findForm.addEventListener('submit', function(e){
+    e.preventDefault(); showMsg('findMsg', '');
+    var p = $('findPhone').value, d = $('findDob').value, bad = false;
+    if (setInvalid($('findPhone'), !/^0\d{9}$/.test(p))) bad = true;
+    if (setInvalid($('findDob'), !d)) bad = true;
+    if (bad) return;
+    var btn = $('findBtn'); btn.disabled = true; btn.textContent = 'Searching…';
+    var done = function(){ btn.disabled = false; btn.textContent = 'Find my registration'; };
+    var ok = function(res){ done(); loadRecord(res); };
+    var fail = function(err){ done(); showMsg('findMsg', cleanErr(err)); };
+
+    if (hasGAS || hasAPI) {
+      callBackend('findRegistration', [p, d], ok, fail);
+    } else {
+      setTimeout(function(){
+        if (p === '0241234567') ok({ token: 'demo', minutes: 30, photoData: '', record: { id: 'GWP-CCC-0007', firstName: 'Ama', surname: 'Mensah', otherNames: 'Serwaa', gender: 'Female', role: 'Catechist', dob: d, maritalStatus: 'Married', email: 'ama.mensah@gmail.com', phone: p, phone2: '', district: 'Amasaman', congregation: 'Pokuase Congregation', consecrationDate: '2015-06-14', emergencyName: 'Kwame Mensah', emergencyRelationship: 'Husband', emergencyPhone: '0201234567' } });
+        else fail({ message: 'USER: No registration matches that phone number and date of birth. Check both and try again.' });
+      }, 500);
+    }
+  });
+
+  // Live card
+  function preview(){
+    var n = [val('firstName'), val('otherNames'), val('surname')].filter(Boolean).join(' ');
+    $('cName').textContent = n || 'Your name';
+    var r = form.querySelector('input[name=role]:checked');
+    $('cRole').textContent = r ? r.value : 'Role';
+    $('cDistrict').textContent = district.value || '—';
+    $('cCong').textContent = cong.value || '—';
+  }
+  form.addEventListener('input', preview); form.addEventListener('change', preview);
+  function val(id){ return ($(id).value || '').trim(); }
+
+  // Photo compression
+  var PHOTO = '';
+  var TARGET_BYTES = 150 * 1024;
+  var HARD_LIMIT = 500 * 1024;
+  var OUT_W = 600, OUT_H = 800;
+
+  function dataUrlBytes(d){ var b64 = d.split(',')[1] || ''; return Math.floor(b64.length * 3 / 4) - (b64.endsWith('==') ? 2 : b64.endsWith('=') ? 1 : 0); }
+  function kb(n){ return n < 1024 ? n + ' B' : (n / 1024 < 1024 ? Math.round(n / 1024) + ' KB' : (n / 1048576).toFixed(1) + ' MB'); }
+
+  function setPhoto(dataUrl, info){
+    PHOTO = dataUrl || '';
+    var bg = PHOTO ? 'url(' + PHOTO + ')' : '';
+    $('phPrev').style.backgroundImage = bg; $('phPrev').classList.toggle('has', !!PHOTO);
+    $('phPrev').textContent = PHOTO ? '' : 'No photo yet';
+    $('cAvatar').style.backgroundImage = bg; $('cAvatar').classList.toggle('has', !!PHOTO);
+    $('phRemove').hidden = !PHOTO;
+    $('phInfo').textContent = info || '';
+  }
+
+  function compress(img){
+    var sw = img.naturalWidth, sh = img.naturalHeight, ratio = OUT_W / OUT_H;
+    var cw = sw, ch = sh, sx = 0, sy = 0;
+    if (sw / sh > ratio) { cw = Math.round(sh * ratio); sx = Math.round((sw - cw) / 2); }
+    else { ch = Math.round(sw / ratio); sy = Math.round((sh - ch) * 0.3); }
+    var scale = Math.min(1, OUT_W / cw), best = null;
+    for (var pass = 0; pass < 4; pass++) {
+      var w = Math.max(150, Math.round(cw * scale)), h = Math.max(200, Math.round(ch * scale));
+      var c = document.createElement('canvas'); c.width = w; c.height = h;
+      var g = c.getContext('2d');
+      g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high';
+      g.fillStyle = '#fff'; g.fillRect(0, 0, w, h);
+      g.drawImage(img, sx, sy, cw, ch, 0, 0, w, h);
+      for (var q = 0.85; q >= 0.5; q -= 0.07) {
+        var d = c.toDataURL('image/jpeg', q), n = dataUrlBytes(d);
+        if (!best || n < best.bytes) best = { url: d, bytes: n, w: w, h: h };
+        if (n <= TARGET_BYTES) return { url: d, bytes: n, w: w, h: h };
+      }
+      scale *= 0.75;
+    }
+    return best;
+  }
+
+  function readPhoto(file){
+    $('photoField').classList.remove('invalid');
+    if (!file) return;
+    if (file.type && !/^image\//.test(file.type)) { $('photoField').classList.add('invalid'); return; }
+    $('phPrev').textContent = 'Compressing…'; $('phInfo').textContent = '';
+    var url = URL.createObjectURL(file), img = new Image();
+    img.onload = function(){
+      var r;
+      try { r = compress(img); } catch (e) { r = null; }
+      URL.revokeObjectURL(url);
+      if (!r || r.bytes > HARD_LIMIT) { setPhoto(''); $('photoField').classList.add('invalid'); return; }
+      KEEP_PHOTO = false;
+      setPhoto(r.url, 'Photo ready: ' + kb(file.size) + ' → ' + kb(r.bytes) + ' (' + r.w + '×' + r.h + ')');
+    };
+    img.onerror = function(){ URL.revokeObjectURL(url); setPhoto(''); $('photoField').classList.add('invalid'); };
+    img.src = url;
+  }
+  ['phCamera','phGallery'].forEach(function(id){
+    $(id).addEventListener('change', function(e){ readPhoto(e.target.files && e.target.files[0]); e.target.value = ''; });
+  });
+  $('phRemove').addEventListener('click', function(){ setPhoto(''); KEEP_PHOTO = false; });
+
+  // Dates can't be in the future
+  var today = new Date().toISOString().slice(0,10);
+  $('dob').max = today; $('consecrationDate').max = today; $('findDob').max = today;
+
+  function digits(s){ return (s || '').replace(/\D/g,''); }
+
+  function normPhone(v){
+    var d = digits(v);
+    if (/^233\d{9}$/.test(d)) d = '0' + d.slice(3);
+    else if (/^\d{9}$/.test(d) && d[0] !== '0' && v.trim().charAt(0) === '+') d = '0' + d;
+    return d.slice(0, 10);
+  }
+  function phoneOk(v){ return /^0\d{9}$/.test(v); }
+
+  Array.prototype.forEach.call(document.querySelectorAll('.phone'), function(el){
+    el.addEventListener('input', function(){ el.value = normPhone(el.value); });
+  });
+
+  function setInvalid(el, isBad){
+    var box = el.closest('.field');
+    if (box) box.classList.toggle('invalid', !!isBad);
+    return !!isBad;
+  }
+
+  var EMAIL_RE = /^[A-Za-z0-9](?:[A-Za-z0-9._%+-]{0,62}[A-Za-z0-9_%+-])?@(?:[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?\.)+[A-Za-z]{2,24}$/;
+  function emailOk(v){ return v.length <= 100 && v.indexOf('..') === -1 && EMAIL_RE.test(v); }
+
+  var DOMAIN_TYPOS = {
+    'gmai.com':'gmail.com','gmial.com':'gmail.com','gmal.com':'gmail.com','gmail.co':'gmail.com','gmail.cm':'gmail.com',
+    'yaho.com':'yahoo.com','yahooo.com':'yahoo.com','yahoo.co':'yahoo.com','hotmal.com':'hotmail.com','hotmai.com':'hotmail.com'
+  };
+  function checkEmail(showSuggest){
+    var em = val('email'), sug = $('emailSuggest');
+    sug.hidden = true;
+    if (!em) return;
+    var parts = em.split('@');
+    if (showSuggest && parts.length === 2 && DOMAIN_TYPOS[parts[1].toLowerCase()]) {
+      var fixed = parts[0] + '@' + DOMAIN_TYPOS[parts[1].toLowerCase()];
+      $('emailFix').textContent = fixed;
+      sug.hidden = false;
+    }
+  }
+  $('email').addEventListener('blur', function(){ checkEmail(true); });
+  $('emailFix').addEventListener('click', function(){
+    $('email').value = $('emailFix').textContent;
+    $('emailSuggest').hidden = true;
+    setInvalid($('email'), false);
+  });
+
+  function validate(){
+    var bad = [];
+    ['firstName','surname','maritalStatus','district','congregation','emergencyName'].forEach(function(id){
+      if (setInvalid($(id), !val(id))) bad.push($(id));
+    });
+    ['gender','role'].forEach(function(g){
+      var box = form.querySelector('[data-group=' + g + ']');
+      var none = !form.querySelector('input[name=' + g + ']:checked');
+      box.classList.toggle('invalid', none); if (none) bad.push(box.querySelector('input'));
+    });
+    var dob = val('dob');
+    if (setInvalid($('dob'), !dob || dob > today || dob < '1920-01-01')) bad.push($('dob'));
+    var cd = val('consecrationDate');
+    if (setInvalid($('consecrationDate'), !!cd && cd > today)) bad.push($('consecrationDate'));
+    if (setInvalid($('phone'), !phoneOk(val('phone')))) bad.push($('phone'));
+    var p2 = val('phone2');
+    $('phone2Err').textContent = p2 && p2 === val('phone') ? 'This is the same as your contact number. Enter a different number or leave it blank.' : 'Enter 10 digits starting with 0, or leave it blank.';
+    if (setInvalid($('phone2'), !!p2 && (!phoneOk(p2) || p2 === val('phone')))) bad.push($('phone2'));
+    if (setInvalid($('emergencyPhone'), !phoneOk(val('emergencyPhone')))) bad.push($('emergencyPhone'));
+    if (MODE !== 'edit' && setInvalid($('consent'), !$('consent').checked)) bad.push($('consent'));
+    checkEmail(false);
+    var em = val('email');
+    if (setInvalid($('email'), !!em && !emailOk(em))) bad.push($('email'));
+    return bad;
+  }
+
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    $('formMsg').classList.remove('show');
+    var bad = validate();
+    if (bad.length){ bad[0].focus(); bad[0].scrollIntoView({block:'center', behavior:'smooth'}); return; }
+
+    var data = {};
+    new FormData(form).forEach(function(v,k){ data[k] = v; });
+    data.congregation = cong.value; // disabled-safe
+    delete data[''];
+    data.photo = (MODE === 'edit' && KEEP_PHOTO) ? '' : PHOTO;
+    data.keepPhoto = MODE === 'edit' && KEEP_PHOTO;
+    data.consent = MODE !== 'edit' && $('consent').checked;
+    var editing = MODE === 'edit';
+    var label = editing ? 'Save changes' : 'Submit registration';
+    var btn = $('submitBtn'); btn.disabled = true; btn.textContent = data.photo ? 'Uploading photo…' : 'Saving…';
+
+    var ok = function(res){ btn.disabled = false; btn.textContent = label; showDone(res.id, res.photoError, editing); };
+    var fail = function(err){
+      btn.disabled = false; btn.textContent = label;
+      var text = cleanErr(err);
+      if (/editing time has run out/i.test(text)) { goFind(); showMsg('findMsg', text); return; }
+      showMsg('formMsg', text); $('formMsg').scrollIntoView({block:'center'});
+    };
+
+    if (hasGAS || hasAPI) {
+      if (editing) callBackend('updateRegistration', [EDIT_TOKEN, data], ok, fail);
+      else callBackend('submitRegistration', [data], ok, fail);
+    } else {
+      setTimeout(function(){ ok({ id: editing ? $('editId').textContent : 'GWP-CCC-DEMO' }); }, 600);
+    }
+  });
+
+  function showDone(id, photoError, edited){
+    $('regId').textContent = id;
+    $('doneTitle').textContent = edited ? 'Changes saved' : 'Registration saved';
+    $('doneText').textContent = edited ? 'Your details have been updated.' : 'Keep this registration number for your records. To view or change your details later, tap "Update my details" and enter your contact number and date of birth.';
+    $('editBar').classList.remove('show'); EDIT_TOKEN = '';
+    resetForm(); $('findPhone').value = ''; $('findDob').value = '';
+    var pn = $('photoNote'); pn.textContent = photoError ? photoError + ' Please send your photo to the Presbytery office with your registration number.' : ''; pn.style.display = photoError ? 'block' : 'none';
+    form.style.display = 'none'; $('bar').style.display = 'none'; findForm.hidden = true;
+    $('done').classList.add('show'); window.scrollTo(0,0);
+  }
+  $('again').addEventListener('click', goNew);
+
+  if (hasGAS || hasAPI) {
+    callBackend('getLookups', [], fillDistricts, function(){
+      district.innerHTML = '<option value="">Could not load districts — refresh the page</option>';
+    });
+  } else {
+    fillDistricts(DEMO);
+  }
+})();
+</script>
+</body>
+</html>
